@@ -1,0 +1,43 @@
+# Node.js
+**/node_modules/
+npm-debug.log
+.env
+build/
+dist/
+tmp/
+*.zip
+*.rar
+*.7z
+
+# React (Frontend)
+build/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+coverage/
+
+# Docker
+.dockerignore
+docker-compose.override.yml # If you use an override file for local development
+data/ # Directory used by Postgres for persistent data (if mounted)
+volumes/ # General directory for Docker volumes (if used)
+
+# Operating System
+.DS_Store
+Thumbs.db
+.idea/ # JetBrains IDEs
+.vscode/ # VS Code
+*.iml # IntelliJ IDEA
+.project
+.classpath
+.settings/
+
+# Logs
+logs/
+*.log
+
+# Editor/IDE specific files
+*~
+*.swp
+.history/

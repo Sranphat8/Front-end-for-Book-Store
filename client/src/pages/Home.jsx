@@ -1,85 +1,84 @@
-import React, { useState, useEffect } from "react";
-import Restaurants from "../components/Item";
-import RestaurantService from "../services/Item.service";
-import Swal from "sweetalert2";
+import React, { useEffect, useState } from 'react';
+
+import ItemService from '../services/Item.service';
+import Card from '../components/Card';
+import Loading from '../components/Loading';
+
 
 const Home = () => {
-  const [restaurants, setRestaurants] = useState([]);
-  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // โหลดข้อมูลร้านอาหาร
-  useEffect(() => {
-    const getAllRestaurant = async () => {
-      try {
-        const response = await RestaurantService.getAllRestaurants();
-        if (response.status === 200) {
-          setRestaurants(response.data);
-          setFilteredRestaurants(response.data);
-        }
-      } catch (error) {
-        Swal.fire({
-          title: "Get All Restaurants",
-          icon: "error",
-          text: error?.response?.data?.message || error.message,
-        });
+  // ฟังก์ชันดึงข้อมูลจาก API
+  const fetchItems = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await ItemService.getAllItems();
+      let itemArray = [];
+
+      // ตรวจสอบโครงสร้าง response
+      if (Array.isArray(response.data)) {
+        itemArray = response.data;
+      } else if (response.data) {
+        // ถ้าเป็น object ตาม type (books, journals, comics)
+        itemArray = Object.values(response.data)
+          .filter(val => Array.isArray(val))
+          .flat();
       }
-    };
-    getAllRestaurant();
-  }, []);
 
-  // ฟังก์ชันค้นหา
-  const handleSearch = (keyword) => {
-    if (!keyword) {
-      setFilteredRestaurants(restaurants);
-      return;
+      setItems(itemArray || []);
+    } catch (err) {
+      console.error(err);
+      setError(err?.response?.data?.message || err.message || 'ไม่สามารถโหลดข้อมูลได้');
+    } finally {
+      setLoading(false);
     }
-    const filtered = restaurants.filter(
-      (r) =>
-        r.name?.toLowerCase().includes(keyword.toLowerCase()) ||
-        r.type?.toLowerCase().includes(keyword.toLowerCase())
-    );
-    setFilteredRestaurants(filtered);
   };
 
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  if (loading) return <Loading text="กำลังโหลดรายการทั้งหมด..." />;
+  if (error) return <div className="text-center text-error text-xl p-8">{error}</div>;
+  if (!Array.isArray(items) || items.length === 0)
+    return (
+      <div className="text-center p-10 bg-base-200 rounded-box">
+        <p className="text-lg">ไม่พบรายการในระบบ.</p>
+      </div>
+    );
+
+  // จัดกลุ่มตาม itemType
+  const groupedItems = items.reduce((acc, item) => {
+    const typeKey = item.itemType || 'Item';
+    if (!acc[typeKey]) acc[typeKey] = [];
+    acc[typeKey].push(item);
+    return acc;
+  }, {});
+
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto p-4">
+      <h1 className="text-4xl font-bold mb-8 text-center">📚 คลังรายการทั้งหมด</h1>
 
-      <div>
-        <h1 className="title justify-center text-3xl text-center m-5 p-5">
-          Grab Restaurant
-        </h1>
-      </div>
-
-      {/* Search Box */}
-      <div className="mb-5 flex justify-center items-center">
-        <label className="input flex items-center gap-2 w-2xl">
-          <svg
-            className="h-[1em] opacity-50"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-          >
-            <g
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              strokeWidth="2.5"
-              fill="none"
-              stroke="currentColor"
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.3-4.3"></path>
-            </g>
-          </svg>
-          <input
-            type="search"
-            name="keyword"
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search"
-          />
-        </label>
-      </div>
-
-      {/* ส่งค่าไปที่ Restaurants */}
-      <Restaurants restaurants={filteredRestaurants} />
+      {Object.keys(groupedItems).map(typeKey => (
+        <section key={typeKey} className="mb-10">
+          <h2 className="text-3xl font-semibold mb-6 border-b-2 pb-2">
+            {typeKey}s ({groupedItems[typeKey].length} รายการ)
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {groupedItems[typeKey].map(item => (
+              <Card
+                key={item.itemId || item._id}
+                item={item}
+                type={typeKey.toLowerCase() + 's'}
+                onRefresh={fetchItems}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   );
 };

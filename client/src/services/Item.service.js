@@ -1,35 +1,16 @@
 import api from "./api";
-const RESTO_API = import.meta.env.VITE_RESTO_API;
 
-//get all items
-const getAllItems = async () => {
-  return await api.get(ITEM_API);
+const getAllItems = async () => await api.get("/api/items");
+const getItemByTypeAndId = async (type, id) => await api.get(`/api/items/${type}/${id}`);
+const insertItem = async (type, itemData) => {
+  if(type === "Book") return await api.post("/api/books", itemData);
+  if(type === "Journal") return await api.post("/api/journals", itemData);
+  if(type === "Comic") return await api.post("/api/comics", itemData);
 };
-//get item by Id
-const getItemById = async (id) => {
-  //   return await api.get(RESTO_API + "/" + id);
-  return await api.get(`${ITEM_API}/${id}`);
-};
-//update item by Id
-const editItemById = async (id, item) => {
-  return await api.put(`${ITEM_API}/${id}`, item);
-};
-//add Item
-const insertItem = async (item) => {
-  return await api.post(ITEM_API, item);
-};
+const editItemByTypeAndId = async (type, id, itemData) => await api.put(`/api/${type.toLowerCase()}s/${id}`, itemData);
+const deleteItemByTypeAndId = async (type, id) => await api.delete(`/api/${type.toLowerCase()}s/${id}`);
 
-//delete Item
-const deleteItem = async (id) => {
-  return await api.delete(`${ITEM_API}/${id}`);
-};
 
-const ItemService = {
-  getAllItems,
-  getItemById,
-  editItemById,
-  deleteItem,
-  insertItem,
-};
+const ItemService = { getAllItems, getItemByTypeAndId, insertItem, editItemByTypeAndId, deleteItemByTypeAndId };
 
 export default ItemService;

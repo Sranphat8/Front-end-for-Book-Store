@@ -1,28 +1,19 @@
-import { createBrowserRouter } from "react-router";
-import Add from "../pages/Add";
-import Home from "../pages/Home";
-import Update from "../pages/Update";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router';
+import Home from '../pages/Home';
+import AddItem from '../pages/AddItem';
+import EditItem from '../pages/EditItem';
+import Navbar from '../components/Navbar';
 
+const AppRouter = () => (
+  <Router>
+    <Navbar />
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/items/add" element={<AddItem />} />
+      <Route path="/items/edit/:itemType/:id" element={<EditItem />} />
+    </Routes>
+  </Router>
+);
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Home />,
-  },
-  {
-    path: "/add",
-    element: (
-      
-        <Add />
-      
-    ),
-  },
-  {
-    path: "/update/:id",
-    element: (
-
-        <Update />
-    ),
-  },
-]);
-export default router;
+export default AppRouter;

@@ -98,7 +98,7 @@ export default function Home() {
 
   useEffect(() => {
     load();
-
+    
   }, [page]);
 
   return (
@@ -106,38 +106,34 @@ export default function Home() {
       {/* hero / carousel */}
       <div className="carousel w-full rounded-2xl overflow-hidden shadow">
         <div id="slide1" className="carousel-item relative w-full h-[220px] sm:h-[280px] md:h-[340px] lg:h-[380px]">
-          <img src={`${import.meta.env.BASE_URL}images/slide1.jpg`} alt="slide 1" className="w-full h-full object-cover object-center" />
+          <img src="../../public/images/slide1.jpg" alt="slide 1" className="w-full h-full object-cover object-center" />
           <div className="absolute inset-x-5 top-1/2 flex -translate-y-1/2 justify-between">
             <a href="#slide4" className="btn btn-circle">❮</a>
             <a href="#slide2" className="btn btn-circle">❯</a>
           </div>
         </div>
-
         <div id="slide2" className="carousel-item relative w-full h-[220px] sm:h-[280px] md:h-[340px] lg:h-[380px]">
-          <img src={`${import.meta.env.BASE_URL}images/slide2.jpg`} alt="slide 2" className="w-full h-full object-cover object-center" />
+          <img src="../../public/images/slide2.jpg" alt="slide 2" className="w-full h-full object-cover object-center" />
           <div className="absolute inset-x-5 top-1/2 flex -translate-y-1/2 justify-between">
             <a href="#slide1" className="btn btn-circle">❮</a>
             <a href="#slide3" className="btn btn-circle">❯</a>
           </div>
         </div>
-
         <div id="slide3" className="carousel-item relative w-full h-[220px] sm:h-[280px] md:h-[340px] lg:h-[380px]">
-          <img src={`${import.meta.env.BASE_URL}images/slide3.jpg`} alt="slide 3" className="w-full h-full object-cover object-center" />
+          <img src="../../public/images/slide3.jpg" alt="slide 3" className="w-full h-full object-cover object-center" />
           <div className="absolute inset-x-5 top-1/2 flex -translate-y-1/2 justify-between">
             <a href="#slide2" className="btn btn-circle">❮</a>
             <a href="#slide4" className="btn btn-circle">❯</a>
           </div>
         </div>
-
         <div id="slide4" className="carousel-item relative w-full h-[220px] sm:h-[280px] md:h-[340px] lg:h-[380px]">
-          <img src={`${import.meta.env.BASE_URL}images/slide4.jpg`} alt="slide 4" className="w-full h-full object-cover object-center" />
+          <img src="../../public/images/slide4.jpg" alt="slide 4" className="w-full h-full object-cover object-center" />
           <div className="absolute inset-x-5 top-1/2 flex -translate-y-1/2 justify-between">
             <a href="#slide3" className="btn btn-circle">❮</a>
             <a href="#slide1" className="btn btn-circle">❯</a>
           </div>
         </div>
       </div>
-
 
       {/* header */}
       <div className="flex items-center justify-between">
@@ -169,11 +165,11 @@ export default function Home() {
           <section className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {loading
               ? Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="skeleton h-64 w-full rounded-2xl" />
-              ))
+                  <div key={i} className="skeleton h-64 w-full rounded-2xl" />
+                ))
               : items.map((it) => (
-                <ItemCard key={it.itemId} item={it} onView={setActive} />
-              ))}
+                  <ItemCard key={it.itemId} item={it} onView={setActive} />
+                ))}
           </section>
           <div className="flex justify-center mt-6">
             <Pagination

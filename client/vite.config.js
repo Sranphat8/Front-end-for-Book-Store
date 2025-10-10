@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import react from "@vitejs/plugin-react";
 import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
@@ -9,10 +9,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
-    host: '0.0.0.0',
+    host: "0.0.0.0",
     port: 5173,
   },
-
-  // เพื่อให้รูปและ asset ทำงานหลัง deploy
-  base: '/Front-end-for-Book-Store/',
-})
+});

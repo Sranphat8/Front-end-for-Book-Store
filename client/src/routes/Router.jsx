@@ -9,7 +9,7 @@ import EditItem from "../pages/EditItem.jsx";
 
 export default function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Navbar />
       <main className="container mx-auto px-4 py-6">
         <Routes>

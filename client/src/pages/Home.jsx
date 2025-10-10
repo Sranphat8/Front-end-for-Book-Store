@@ -31,6 +31,8 @@ export default function Home() {
     return p;
   }, [page, limit, query]);
 
+  
+
   const fetchById = async (id, type) => {
     // คืนรายการเดียวในรูปแบบ array เพื่อใช้ร่วมกับ grid/card เดิม
     try {

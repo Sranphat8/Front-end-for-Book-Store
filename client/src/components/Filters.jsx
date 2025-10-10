@@ -57,9 +57,7 @@ export default function Filters({ value, onChange, onSubmit, loading }) {
           value={value.itemId || ""}
           onChange={(e) => set("itemId", e.target.value.trim())}
         />
-        <span className="mt-1 text-xs opacity-60">
-          ใส่ไอดีตรงนี้จะค้นหารายการเดียวแบบรวดเร็ว (ถ้ารู้ชนิด เลือกด้านล่างด้วย)
-        </span>
+
       </div>
 
       {/* ค้นหาทั่วไป */}

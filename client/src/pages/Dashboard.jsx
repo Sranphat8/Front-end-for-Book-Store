@@ -7,8 +7,6 @@ import { comicsService } from "../services/Comics.service.js";
 import { itemsService } from "../services/Item.service.js";
 import { confirm, toastERR, toastOK } from "../components/ConfirmDialog.jsx";
 
-
-
 const TABS = [
   { key: "books", label: "Books", icon: <Book className="h-4 w-4" /> },
   { key: "journals", label: "Journals", icon: <Files className="h-4 w-4" /> },
@@ -19,6 +17,55 @@ const STATUS = ["AVAILABLE", "BORROWED", "RESERVED", "MAINTENANCE", "LOST"];
 const tab2type = { books: "Book", journals: "Journal", comics: "Comic" };
 const svcMap = { books: booksService, journals: journalsService, comics: comicsService };
 const typeOptions = ["Book", "Journal", "Comic"];
+
+
+const isLikelyId = (s = "") => {
+  const x = s.trim().toLowerCase().replace(/^id:/, "");
+  
+  return /^[a-f0-9]{24,40}$/.test(x) || /^[0-9a-f-]{32,36}$/.test(x);
+};
+const extractId = (s = "") => s.trim().replace(/^id:/i, "").trim();
+
+
+const normalizeItem = (raw) => {
+  if (!raw) return null;
+  return {
+    itemId: raw.itemId || raw.id || raw._id,
+    itemType: raw.itemType || raw.type,
+    title: raw.title || raw.name || "—",
+    author: raw.author || raw.creator || "",
+    publishYear: raw.publishYear,
+    status: raw.status || "AVAILABLE",
+    coverImage: raw.coverImage || raw.image || raw.cover,
+    category: raw.category,
+    ...raw, 
+  };
+};
+
+// ดึง “รายการเดียว” ตาม id โดยลองบริการตามชนิดที่เดา/เลือก
+const fetchOneById = async (id, preferredType = "") => {
+  const tryCall = async (fn) => {
+    try {
+      const r = await fn(id);
+      const obj = r?.data ?? r;
+      const n = normalizeItem(obj);
+      return n ? [n] : [];
+    } catch {
+      return [];
+    }
+  };
+
+  // ถ้าผู้ใช้/แท็บบอกชนิดไว้ ให้ลองชนิดนั้นก่อน
+  if (preferredType === "Book")    { const x = await tryCall(booksService.get);    if (x.length) return x; }
+  if (preferredType === "Journal") { const f = journalsService.details || journalsService.get; const x = await tryCall(f); if (x.length) return x; }
+  if (preferredType === "Comic")   { const x = await tryCall(comicsService.get);   if (x.length) return x; }
+
+  // ไม่รู้ชนิด  ลองทุก service
+  let x = await tryCall(booksService.get);                            if (x.length) return x;
+  x = await tryCall(journalsService.details || journalsService.get);  if (x.length) return x;
+  x = await tryCall(comicsService.get);                               return x; // [] ก็ได้
+};
+
 
 const Badge = ({ s }) => {
   const c =
@@ -380,43 +427,59 @@ export default function Dashboard() {
   const [editForm, setEditForm] = useState({});
   const [editLoading, setEditLoading] = useState(false);
 
-  
-
   const svc = useMemo(() => svcMap[tab], [tab]);
 
   const loadStats = async () => {
-  try {
-    const all = await itemsService.statistics(); // รวมทุกชนิด
-    const spec =
-      tab === "books"
-        ? await booksService.statistics()
-        : tab === "journals"
-        ? await journalsService.statistics()
-        : await comicsService.statistics();
+    try {
+      const all = await itemsService.statistics();
+      const spec =
+        tab === "books"
+          ? await booksService.statistics()
+          : tab === "journals"
+          ? await journalsService.statistics()
+          : await comicsService.statistics();
+      setStats({ all: all?.data ?? {}, spec: spec?.data ?? {} });
+    } catch (e) {
+      setStats({ all: {}, spec: {} });
+      toastERR(e?.response?.data?.message || e.message || "ดึงสถิติไม่สำเร็จ");
+    }
+  };
 
-    //เก็บ raw payload ทั้งหมด (เผื่อ API เพิ่ม key ใหม่ในอนาคต)
-    setStats({
-      all: all?.data ?? {},
-      spec: spec?.data ?? {},
-    });
-  } catch (e) {
-    setStats({ all: {}, spec: {} });
-    toastERR(e?.response?.data?.message || e.message || "ดึงสถิติไม่สำเร็จ");
-  }
-};
-
+  
   const loadRows = async () => {
     setLoading(true);
     try {
+      
+      if (q?.trim() && isLikelyId(q)) {
+        const id = extractId(q);
+        const preferredType = fType || tab2type[tab] || "";
+        const one = await fetchOneById(id, preferredType);
+        if (!one.length) {
+          setRows([]);
+          setPagination({ currentPage: 1, totalPages: 1 });
+          toastERR("ไม่พบรายการตามไอดีที่ระบุ");
+        } else {
+          setRows(one);
+          setPagination({ currentPage: 1, totalPages: 1 });
+        }
+        return;
+      }
+
+      
       let res;
       const base = { page, limit };
       if (q?.trim()) {
-        res = await itemsService.search(q, page, limit);
+        res = await itemsService.search(q.trim(), page, limit);
       } else if (fStatus || fType) {
-        res = await itemsService.filter({ ...base, status: fStatus || undefined, itemType: fType || undefined });
+        res = await itemsService.filter({
+          ...base,
+          status: fStatus || undefined,
+          itemType: fType || undefined,
+        });
       } else {
         res = await svc.list(base);
       }
+
       setRows(res.data || []);
       setPagination(res.pagination || { currentPage: page, totalPages: 1 });
     } catch (e) {
@@ -429,7 +492,7 @@ export default function Dashboard() {
   useEffect(() => {
     loadRows();
     loadStats();
-  }, [tab, page, limit]); // eslint-disable-line
+  }, [tab, page, limit]); 
 
   const onView = async (row) => {
     try {
@@ -568,7 +631,7 @@ export default function Dashboard() {
               className="input input-bordered"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="พิมพ์ชื่อเรื่อง / ผู้แต่ง / คำค้นหา"
+              placeholder="พิมพ์ชื่อเรื่อง / ผู้แต่ง / คำค้นหา หรือพิมพ์ id:xxxx เพื่อค้นหาด้วยไอดี"
             />
           </div>
           <div className="form-control">

@@ -1,44 +1,60 @@
 import React from "react";
-import { Link, useLocation } from "react-router";
+import { NavLink, Link } from "react-router";
+import { BookOpen, LayoutDashboard } from "lucide-react";
 
-const Navbar = () => {
-  const location = useLocation();
-
-  const links = [
-    { name: "รายการสินค้า", path: "/" },
-    { name: "เพิ่มสินค้าใหม่", path: "/add" },
-  ];
-
+export default function Navbar() {
   return (
-    <nav className="bg-white text-gray-800 shadow-md px-6 py-3 flex items-center justify-between">
-      {/* Brand */}
-      <div className="flex-1">
-        <span className="font-bold text-2xl tracking-wide text-gray-900">
-          📚 Book Store Admin
-        </span>
-      </div>
-
-      {/* Links */}
-      <div className="flex-none gap-3">
-        {links.map((link) => (
-          <Link
-            key={link.path}
-            to={link.path}
-            className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition 
-              ${
-                location.pathname === link.path
-                  ? "bg-indigo-500 text-white shadow-lg"
-                  : "text-gray-700 hover:bg-indigo-100 hover:text-indigo-700"
-              }
-            `}
-          >
-            {link.name}
+    <nav className="navbar bg-base-100 shadow sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        {/* Logo  */}
+        <div className="navbar-start">
+          <Link to="/" className="flex items-center">
+            <div className="h-16 md:h-16">
+              <img
+                src="/images/book_store.avif"
+                alt="Book Store"
+                className="h-full w-auto object-contain select-none"
+                draggable="false"
+              />
+            </div>
           </Link>
-        ))}
+        </div>
+
+        {/* เมนู */}
+        <div className="navbar-center hidden md:flex">
+          <ul className="menu menu-horizontal gap-1">
+            <li>
+              <NavLink to="/" end className="gap-2">
+                <BookOpen className="h-4 w-4" /> Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/dashboard" className="gap-2">
+                <LayoutDashboard className="h-4 w-4" /> Dashboard
+              </NavLink>
+            </li>
+          </ul>
+        </div>
+
+        {/* เมนูบนมือถือ */}
+        <div className="navbar-end md:hidden">
+          <details className="dropdown dropdown-end">
+            <summary className="btn btn-ghost">เมนู</summary>
+            <ul className="menu dropdown-content bg-base-100 rounded-box shadow mt-3 w-52">
+              <li>
+                <NavLink to="/" end className="gap-2">
+                  <BookOpen className="h-4 w-4" /> Home
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/dashboard" className="gap-2">
+                  <LayoutDashboard className="h-4 w-4" /> Dashboard
+                </NavLink>
+              </li>
+            </ul>
+          </details>
+        </div>
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

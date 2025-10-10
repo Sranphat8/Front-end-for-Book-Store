@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const baseURL = import.meta.env.VITE_BASE_URL;
-
-const api = axios.create({
-  baseURL,
-  headers: { "Content-Type": "application/json" },
+export const api = axios.create({
+  baseURL: "https://bookshop-api-er7t.onrender.com",
+  headers: { "Content-Type": "application/json", Accept: "application/json" },
+  timeout: 20000,
 });
 
-export default api;
+
+export const mapRes = (res) => res?.data ?? {};
+

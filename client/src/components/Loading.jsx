@@ -1,10 +1,10 @@
-const Loading = ({ text = "กำลังโหลด..." }) => {
-    return (
-        <div className="flex justify-center items-center h-screen flex-col">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
-            <p className="mt-2 text-lg text-gray-600">{text}</p>
-        </div>
-    );
-};
+import React from "react";
+
+const Loading = ({ text = "Loading..." }) => (
+  <div className="w-full flex justify-center py-16">
+    <span className="loading loading-spinner loading-lg" />
+    <span className="ml-3 text-lg">{text}</span>
+  </div>
+);
 
 export default Loading;

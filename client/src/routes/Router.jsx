@@ -1,19 +1,26 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router';
-import Home from '../pages/Home';
-import AddItem from '../pages/AddItem';
-import EditItem from '../pages/EditItem';
-import Navbar from '../components/Navbar';
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 
-const AppRouter = () => (
-  <Router>
-    <Navbar />
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/items/add" element={<AddItem />} />
-      <Route path="/items/edit/:itemType/:id" element={<EditItem />} />
-    </Routes>
-  </Router>
-);
+import Navbar from "../components/Navbar";
+import Home from "../pages/Home";
+import Dashboard from "../pages/Dashboard.jsx";
+import AddItem from "../pages/AddItem.jsx";
+import EditItem from "../pages/EditItem.jsx";
 
-export default AppRouter;
+export default function AppRouter() {
+  return (
+    <BrowserRouter>
+      <Navbar />
+      <main className="container mx-auto px-4 py-6">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/add" element={<AddItem />} />
+          <Route path="/edit/:type/:id" element={<EditItem />} />
+          {/* fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </BrowserRouter>
+  );
+}
